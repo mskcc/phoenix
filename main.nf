@@ -1,12 +1,12 @@
 #!/usr/bin/env nextflow
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    nf-core/phoenix
+    phoenix
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Github : https://github.com/nf-core/phoenix
-    Website: https://nf-co.re/phoenix
-    Slack  : https://nfcore.slack.com/channels/phoenix
+    Github : https://github.com/mskcc/phoenix
 ----------------------------------------------------------------------------------------
+
+    Pipeline developed using nf-core methodologies
 */
 
 nextflow.enable.dsl = 2
