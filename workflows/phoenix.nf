@@ -11,7 +11,7 @@ WorkflowPhoenix.initialise(params, log)
 
 // TODO nf-core: Add all file path parameters for the pipeline to the list below
 // Check input path parameters to see if they exist
-def checkPathParamList = [ params.input, params.multiqc_config, params.fasta ]
+def checkPathParamList = [ params.input, params.multiqc_config, params.fasta, params.bwa_index ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
@@ -38,8 +38,7 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
-include { BWA_INDEX } from '../modules/nf-core/bwa/index/main'
-include { FASTQ_ALIGN_BWA } from '../subworkflows/nf-core/fastq_align_bwa/main' 
+include { FASTQ_ALIGN_BWA } from '../subworkflows/nf-core/fastq_align_bwa/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -74,6 +73,15 @@ workflow PHOENIX {
         ch_input
     )
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
+
+    ch_genome = channel.of([ [:], file(params.bwa_index)])
+    ch_sort_bam = channel.of(true)
+    FASTQ_ALIGN_BWA(
+        INPUT_CHECK.out.reads,
+        ch_genome,
+        true,
+        params.fasta
+    )
 
     //
     // MODULE: Run FastQC
