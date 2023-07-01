@@ -73,14 +73,20 @@ workflow PHOENIX {
         ch_input
     )
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
-
-    ch_genome = channel.of([ [:], file(params.bwa_index)])
+    
+    //
+    // SUBWORKFLOW: Perform BWA-MEM alignment using pre-built bwa index, followed by samtools sort
+    //
+    // TODO: Make it so bwa_index is generated if params.bwa_index is not provided
+    ch_bwa_index = channel.of([ [id:"bwa_index_directory"], file(params.bwa_index)])
+    ch_fasta = channel.of([ [id:"reference_fasta"], file(params.fasta)])
     ch_sort_bam = channel.of(true)
+
     FASTQ_ALIGN_BWA(
         INPUT_CHECK.out.reads,
-        ch_genome,
+        ch_bwa_index,
         true,
-        params.fasta
+        ch_fasta
     )
 
     //
