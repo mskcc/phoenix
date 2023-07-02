@@ -38,7 +38,6 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
-include { FASTQ_ALIGN_BWA } from '../subworkflows/nf-core/fastq_align_bwa/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -52,6 +51,8 @@ include { FASTQ_ALIGN_BWA } from '../subworkflows/nf-core/fastq_align_bwa/main'
 include { FASTQC                      } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+include { TRIMGALORE } from '../modules/nf-core/trimgalore/main'
+include { FASTQ_ALIGN_BWA } from '../subworkflows/nf-core/fastq_align_bwa/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -73,7 +74,22 @@ workflow PHOENIX {
         ch_input
     )
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
-    
+
+    //
+    // SUBWORKFLOW: TrimGalore if skip_trimming is false
+    //
+
+    ch_fastq_input = Channel.empty()    
+    if (!params.skip_trimming) {
+        TRIMGALORE(
+            INPUT_CHECK.out.reads
+        )
+        ch_fastq_input = TRIMGALORE.out.reads
+    }
+    else {
+        ch_fastq_input = INPUT_CHECK.out.reads
+    }
+
     //
     // SUBWORKFLOW: Perform BWA-MEM alignment using pre-built bwa index, followed by samtools sort
     //
@@ -83,7 +99,7 @@ workflow PHOENIX {
     ch_sort_bam = channel.of(true)
 
     FASTQ_ALIGN_BWA(
-        INPUT_CHECK.out.reads,
+        ch_fastq_input,
         ch_bwa_index,
         true,
         ch_fasta

@@ -42,6 +42,20 @@
                 }
             }
         },
+        "adapter_trimming_options": {
+            "title": "Adapter trimming options",
+            "type": "object",
+            "fa_icon": "fas fa-cut",
+            "description": "Options to adjust adapter trimming criteria.",
+            "properties": {
+                "skip_trimming": {
+                    "type": "boolean",
+                    "description": "Skip the adapter trimming step.",
+                    "help_text": "Use this if your input FastQ files have already been trimmed outside of the workflow or if you're very confident that there is no adapter contamination in your data.",
+                    "fa_icon": "fas fa-fast-forward"
+                }
+            }
+        },
         "reference_genome_options": {
             "title": "Reference genome options",
             "type": "object",
