@@ -53,6 +53,7 @@ include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 include { TRIMGALORE } from '../modules/nf-core/trimgalore/main'
 include { FASTQ_ALIGN_BWA } from '../subworkflows/nf-core/fastq_align_bwa/main'
+include { BAM_MARKDUPLICATES_PICARD } from '../subworkflows/nf-core/bam_markduplicates_picard/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -85,6 +86,7 @@ workflow PHOENIX {
             INPUT_CHECK.out.reads
         )
         ch_fastq_input = TRIMGALORE.out.reads
+        ch_versions = ch_versions.mix(TRIMGALORE.out.versions.first())
     }
     else {
         ch_fastq_input = INPUT_CHECK.out.reads
@@ -94,8 +96,11 @@ workflow PHOENIX {
     // SUBWORKFLOW: Perform BWA-MEM alignment using pre-built bwa index, followed by samtools sort
     //
     // TODO: Make it so bwa_index is generated if params.bwa_index is not provided
+    // TODO: Better handling of fai and fasta files?
+    //    Both TODOs handled in https://github.com/nf-core/atacseq/blob/master/subworkflows/local/prepare_genome.nf
     ch_bwa_index = channel.of([ [id:"bwa_index_directory"], file(params.bwa_index)])
     ch_fasta = channel.of([ [id:"reference_fasta"], file(params.fasta)])
+    ch_fai = channel.of([ [id:"reference_fasta_fai"], file(params.fasta + ".fai")])
     ch_sort_bam = channel.of(true)
 
     FASTQ_ALIGN_BWA(
@@ -104,6 +109,17 @@ workflow PHOENIX {
         true,
         ch_fasta
     )
+    ch_versions = ch_versions.mix(FASTQ_ALIGN_BWA.out.versions.first())
+
+    //
+    // SUBWORKFLOW: Run MarkDuplicates on bam
+    //
+    BAM_MARKDUPLICATES_PICARD (
+        FASTQ_ALIGN_BWA.out.bam,
+        ch_fasta,
+        ch_fai
+    )
+    ch_versions = ch_versions.mix(BAM_MARKDUPLICATES_PICARD.out.versions.first())
 
     //
     // MODULE: Run FastQC
