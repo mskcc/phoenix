@@ -12,10 +12,10 @@ process NGS_DISAMBIGUATE {
     tuple val(meta), path(bam_b) // mouse
 
     output:
-    tuple val(meta), path("*.disambiguatedSpeciesA.bam")        , emit: bam_disambiguated_a
-    tuple val(meta), path("*.disambiguatedSpeciesA.bam")        , emit: bam_disambiguated_b
-    tuple val(meta), path("*_summary.txt")                      , emit: summary
-    path "versions.yml"                                         , emit: versions
+    tuple val(meta), path("$outputdir/*.disambiguatedSpeciesA.bam")  , emit: bam_disambiguated_a
+    tuple val(meta), path("$outputdir/*.disambiguatedSpeciesA.bam")  , emit: bam_disambiguated_b
+    tuple val(meta), path("$outputdir/*_summary.txt")                , emit: summary
+    path "versions.yml"                                              , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -23,10 +23,11 @@ process NGS_DISAMBIGUATE {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
+    outputdir = ${prefix}_disambiguated
     """
     ngs_disambiguate --prefix ${prefix} \\
         ${args} \\
-        --output-dir ${prefix}_disambiguated \\
+        --output-dir $outputdir \\
         --aligner bwa \\
         $bam_a \\
         $bam_b
