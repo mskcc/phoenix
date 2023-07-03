@@ -38,6 +38,7 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
+include { ALIGNMENT } from '../subworkflows/local/alignment/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -52,8 +53,6 @@ include { FASTQC                      } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 include { TRIMGALORE } from '../modules/nf-core/trimgalore/main'
-include { FASTQ_ALIGN_BWA } from '../subworkflows/nf-core/fastq_align_bwa/main'
-include { BAM_MARKDUPLICATES_PICARD } from '../subworkflows/nf-core/bam_markduplicates_picard/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -93,33 +92,19 @@ workflow PHOENIX {
     }
 
     //
-    // SUBWORKFLOW: Perform BWA-MEM alignment using pre-built bwa index, followed by samtools sort
+    // SUBWORKFLOW: Perform ALIGNMENT to Human Reference
     //
-    // TODO: Make it so bwa_index is generated if params.bwa_index is not provided
-    // TODO: Better handling of fai and fasta files?
-    //    Both TODOs handled in https://github.com/nf-core/atacseq/blob/master/subworkflows/local/prepare_genome.nf
+    // Assumes bwa index and fasta fai files are made beforehand
     ch_bwa_index = channel.of([ [id:"bwa_index_directory"], file(params.bwa_index)])
     ch_fasta = channel.of([ [id:"reference_fasta"], file(params.fasta)])
     ch_fai = channel.of([ [id:"reference_fasta_fai"], file(params.fasta + ".fai")])
-    ch_sort_bam = channel.of(true)
 
-    FASTQ_ALIGN_BWA(
+    ALIGNMENT (
         ch_fastq_input,
-        ch_bwa_index,
-        true,
-        ch_fasta
-    )
-    ch_versions = ch_versions.mix(FASTQ_ALIGN_BWA.out.versions.first())
-
-    //
-    // SUBWORKFLOW: Run MarkDuplicates on bam
-    //
-    BAM_MARKDUPLICATES_PICARD (
-        FASTQ_ALIGN_BWA.out.bam,
         ch_fasta,
-        ch_fai
+        ch_fai,
+        ch_bwa_index
     )
-    ch_versions = ch_versions.mix(BAM_MARKDUPLICATES_PICARD.out.versions.first())
 
     //
     // MODULE: Run FastQC
