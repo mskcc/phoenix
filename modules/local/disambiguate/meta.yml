@@ -1,0 +1,50 @@
+name: disambiguate
+description: Tool for separating one species from another within two bams
+keywords:
+  - disambiguate
+  - xenografts
+  - pdx
+tools:
+  - ngs_disambiguate:
+      description: |
+        Tool for separating one species from another
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test' ]
+  - bam_a:
+      type: file
+      description: |
+        File containing bam of sample aligned to species A
+  - bam_b:
+      type: file
+      description: |
+        File containing bam of sample aligned to species B
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test' ]
+  - bam_disambiguated_a:
+      type: file
+      description: |
+      pattern: "*.disambiguatedSpeciesA.bam"
+        BAM containing reads that only align to species A
+  - bam_disambiguated_b:
+      type: file
+      description: |
+      pattern: "*.disambiguatedSpeciesB.bam"
+        BAM containing reads that only align to species B
+  - summary:
+      type: file
+      description: Summary of results
+      pattern: "*_summary.txt"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@allanbolipata"
