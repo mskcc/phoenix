@@ -11,7 +11,7 @@ WorkflowPhoenix.initialise(params, log)
 
 // TODO nf-core: Add all file path parameters for the pipeline to the list below
 // Check input path parameters to see if they exist
-def checkPathParamList = [ params.input, params.multiqc_config, params.fasta, params.bwa_index ]
+def checkPathParamList = [ params.input, params.multiqc_config, params.fasta_href, params.bwa_index_href ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
@@ -95,15 +95,15 @@ workflow PHOENIX {
     // SUBWORKFLOW: Perform ALIGNMENT to Human Reference
     //
     // Assumes bwa index and fasta fai files are made beforehand
-    ch_bwa_index = channel.of([ [id:"bwa_index_directory"], file(params.bwa_index)])
-    ch_fasta = channel.of([ [id:"reference_fasta"], file(params.fasta)])
-    ch_fai = channel.of([ [id:"reference_fasta_fai"], file(params.fasta + ".fai")])
+    ch_bwa_index_href = channel.of([ [id:"bwa_index_directory"], file(params.bwa_index_href)]).collect()
+    ch_fasta_href = channel.of([ [id:"reference_fasta"], file(params.fasta_href)])
+    ch_fai_href = channel.of([ [id:"reference_fasta_fai"], file(params.fasta_href + ".fai")])
 
     ALIGNMENT (
         ch_fastq_input,
-        ch_fasta,
-        ch_fai,
-        ch_bwa_index
+        ch_fasta_href,
+        ch_fai_href,
+        ch_bwa_index_href
     )
 
     //

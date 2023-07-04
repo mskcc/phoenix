@@ -14,9 +14,13 @@ class WorkflowPhoenix {
         genomeExistsError(params, log)
 
 
-        if (!params.fasta) {
-            Nextflow.error "Genome fasta file not specified with e.g. '--fasta genome.fa' or via a detectable config file."
+        if (!params.fasta_href) {
+            Nextflow.error "Human genome fasta file not specified with e.g. '--fasta_href genome.fa' or via a detectable config file."
         }
+        if (!params.bwa_index_href) {
+            Nextflow.error "Human genome bwa index directory not specified with e.g. '--bwa_index_href <dir>' or via a detectable config file."
+        }
+
     }
 
     //
