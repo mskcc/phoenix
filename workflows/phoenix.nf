@@ -75,6 +75,7 @@ workflow PHOENIX {
     )
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
+
     //
     // SUBWORKFLOW: TrimGalore if skip_trimming is false
     //
