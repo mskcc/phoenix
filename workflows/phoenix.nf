@@ -75,7 +75,6 @@ workflow PHOENIX {
     )
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
-
     //
     // SUBWORKFLOW: TrimGalore if skip_trimming is false
     //
@@ -106,6 +105,7 @@ workflow PHOENIX {
         ch_fai_href,
         ch_bwa_index_href
     )
+    ch_versions = ch_versions.mix(ALIGNMENT.out.versions)
 
     //
     // MODULE: Run FastQC

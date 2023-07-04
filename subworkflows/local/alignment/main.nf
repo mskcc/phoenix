@@ -51,9 +51,7 @@ workflow ALIGNMENT {
         ch_sort_bam
     )
     ch_versions = ch_versions.mix(PICARD_MERGESAMFILES.out.versions.first())
-
-    PICARD_MERGESAMFILES.out.bam.view()
-
+ 
     //
     // SUBWORKFLOW: Run MarkDuplicates on bam
     //
