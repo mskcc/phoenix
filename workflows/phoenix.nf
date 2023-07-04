@@ -96,8 +96,8 @@ workflow PHOENIX {
     //
     // Assumes bwa index and fasta fai files are made beforehand
     ch_bwa_index_href = channel.of([ [id:"bwa_index_directory"], file(params.bwa_index_href)]).collect()
-    ch_fasta_href = channel.of([ [id:"reference_fasta"], file(params.fasta_href)])
-    ch_fai_href = channel.of([ [id:"reference_fasta_fai"], file(params.fasta_href + ".fai")])
+    ch_fasta_href = channel.of([ [id:"reference_fasta"], file(params.fasta_href)]).collect()
+    ch_fai_href = channel.of([ [id:"reference_fasta_fai"], file(params.fasta_href + ".fai")]).collect()
 
     ALIGNMENT (
         ch_fastq_input,

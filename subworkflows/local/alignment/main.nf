@@ -26,11 +26,39 @@ workflow ALIGNMENT {
     )
     ch_versions = ch_versions.mix(FASTQ_ALIGN_BWA.out.versions.first())
 
+    // Create channels: [ meta, [bam] ]
+    // This groups bams based on their sample id (or meta.id), removing _T\d+ suffixes
+    ch_align_bam = FASTQ_ALIGN_BWA.out.bam
+    ch_align_bam
+        .map {
+            meta, bam ->
+                def meta_clone = meta.clone()
+                meta_clone.remove('read_group')
+                meta_clone.id = meta_clone.id - ~/_T\d+$/
+                [ meta_clone, bam ]
+        }
+        .groupTuple(by: [0])
+        .map {
+            meta, bam ->
+                [ meta, bam.flatten() ]
+        }
+        .set { ch_sort_bam }
+
+    //
+    // MODULE: Merge resequenced BAM files
+    //
+    PICARD_MERGESAMFILES (
+        ch_sort_bam
+    )
+    ch_versions = ch_versions.mix(PICARD_MERGESAMFILES.out.versions.first())
+
+    PICARD_MERGESAMFILES.out.bam.view()
+
     //
     // SUBWORKFLOW: Run MarkDuplicates on bam
     //
     BAM_MARKDUPLICATES_PICARD (
-        FASTQ_ALIGN_BWA.out.bam,
+        PICARD_MERGESAMFILES.out.bam,
         ch_fasta,
         ch_fai
     )
