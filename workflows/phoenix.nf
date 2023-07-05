@@ -76,7 +76,9 @@ workflow PHOENIX {
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
     //
-    // SUBWORKFLOW: TrimGalore if skip_trimming is false
+    // SUBWORKFLOW: TrimGalore if skip_trimming is false;
+    //      skip_trimming is by default false, switched to true
+    //      with command line argument --skip_trimming
     //
 
     ch_fastq_input = Channel.empty()    
