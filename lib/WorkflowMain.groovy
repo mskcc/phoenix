@@ -82,8 +82,8 @@ class WorkflowMain {
         NfcoreTemplate.awsBatch(workflow, params)
 
         // Check input has been provided
-        if (!params.input) {
-            Nextflow.error("Please provide an input samplesheet to the pipeline e.g. '--input samplesheet.csv'")
+        if (!params.input && !params.input_bam) {
+            Nextflow.error("Please provide an input or input bam samplesheet to the pipeline e.g. '--input samplesheet.csv' or '--input_bam samplesheet_bam.csv")
         }
     }
     //
