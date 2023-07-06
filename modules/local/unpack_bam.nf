@@ -11,7 +11,7 @@ process UNPACK_BAM {
     tuple val(meta), path(input_bam)
 
     output:
-    tuple val(meta) path("${meta.id}/*.*")     , emit: bams
+    tuple val(meta), path("${meta.id}/*.*")    , emit: fastqs
     path "versions.yml"                        , emit: versions
 
     when:
