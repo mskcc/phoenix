@@ -35,6 +35,7 @@ class RowChecker:
         first_col="fastq_1",
         second_col="fastq_2",
         single_col="single_end",
+        pdx_col="is_pdx",
         **kwargs,
     ):
         """
@@ -50,6 +51,9 @@ class RowChecker:
             single_col (str): The name of the new column that will be inserted and
                 records whether the sample contains single- or paired-end sequencing
                 reads (default "single_end").
+            pdx_col (str): The name of the new column that is true if sample is PDX,
+                inserted if empty 
+
 
         """
         super().__init__(**kwargs)
@@ -57,6 +61,7 @@ class RowChecker:
         self._first_col = first_col
         self._second_col = second_col
         self._single_col = single_col
+        self._pdx_col = pdx_col
         self._seen = set()
         self.modified = []
 
@@ -73,6 +78,7 @@ class RowChecker:
         self._validate_first(row)
         self._validate_second(row)
         self._validate_pair(row)
+        self._validate_pdx_val(row)
         self._seen.add((row[self._sample_col], row[self._first_col]))
         self.modified.append(row)
 
@@ -112,6 +118,12 @@ class RowChecker:
                 f"The FASTQ file has an unrecognized extension: {filename}\n"
                 f"It should be one of: {', '.join(self.VALID_FORMATS)}"
             )
+
+    def _validate_pdx_val(self, row): 
+        if row[self._pdx_col].lower() == "true":
+            row[self._pdx_col] = True
+        else:
+            row[self._pdx_col] = False
 
     def validate_unique_samples(self):
         """
@@ -188,8 +200,8 @@ def check_samplesheet(file_in, file_out):
         https://raw.githubusercontent.com/nf-core/test-datasets/viralrecon/samplesheet/samplesheet_test_illumina_amplicon.csv
 
     """
-    required_columns = {"sample", "fastq_1", "fastq_2"}
-    # See https://docs.python.org/3.9/library/csv.html#id3 to read up on `newline=""`.
+    required_columns = {"sample", "is_pdx", "fastq_1", "fastq_2"}
+    # See https://docs.python.org/3.9/library/csv.html#i/d3 to read up on `newline=""`.
     with file_in.open(newline="") as in_handle:
         reader = csv.DictReader(in_handle, dialect=sniff_format(in_handle))
         # Validate the existence of the expected header columns.
@@ -208,11 +220,13 @@ def check_samplesheet(file_in, file_out):
         checker.validate_unique_samples()
     header = list(reader.fieldnames)
     header.insert(1, "single_end")
+    print(header)
     # See https://docs.python.org/3.9/library/csv.html#id3 to read up on `newline=""`.
     with file_out.open(mode="w", newline="") as out_handle:
         writer = csv.DictWriter(out_handle, header, delimiter=",")
         writer.writeheader()
         for row in checker.modified:
+            print(row)
             writer.writerow(row)
 
 

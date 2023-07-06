@@ -36,10 +36,11 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
 include { ALIGNMENT } from '../subworkflows/local/alignment/main'
+include { RESOLVE_PDX } from '../subworkflows/local/resolve_pdx/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    IMPORT NF-CORE MODULES/SUBWORKFLOWS
+    IMPORT NF-CORE MODULES/SUBWORKFLOWS:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
@@ -73,7 +74,9 @@ workflow PHOENIX {
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
     //
-    // SUBWORKFLOW: TrimGalore if skip_trimming is false
+    // SUBWORKFLOW: TrimGalore if skip_trimming is false;
+    //      skip_trimming is by default false, switched to true
+    //      with command line argument --skip_trimming
     //
 
     ch_fastq_input = Channel.empty()    
@@ -88,20 +91,48 @@ workflow PHOENIX {
         ch_fastq_input = INPUT_CHECK.out.reads
     }
 
+
+    ch_fastq_input
+        .branch {
+            meta, fastq ->
+                ch_fastqs_for_disambiguate: meta.is_pdx
+                    return tuple (meta, fastq)
+                ch_fastq_input: true
+                    return tuple (meta, fastq) 
+        }.set { ch_fastqs_split }
+
     //
     // SUBWORKFLOW: Perform ALIGNMENT to Human Reference
+    //     and Mouse Reference if reads are Xenograft
     //
     // Assumes bwa index and fasta fai files are made beforehand
-    ch_bwa_index_href = channel.of([ [id:"bwa_index_directory"], file(params.bwa_index_href)]).collect()
-    ch_fasta_href = channel.of([ [id:"reference_fasta"], file(params.fasta_href)]).collect()
-    ch_fai_href = channel.of([ [id:"reference_fasta_fai"], file(params.fasta_href + ".fai")]).collect()
+    ch_bwa_index_href = channel.of([ [id:"bwa_index_directory_human"], file(params.bwa_index_href)]).collect()
+    ch_fasta_href = channel.of([ [id:"reference_fasta_human"], file(params.fasta_href)]).collect()
+    ch_fai_href = channel.of([ [id:"reference_fasta_fai_human"], file(params.fasta_href + ".fai")]).collect()
+    ch_bwa_index_mref = channel.of([ [id:"bwa_index_directory_mouse"], file(params.bwa_index_mref)]).collect()
+    ch_fasta_mref = channel.of([ [id:"reference_fasta_mouse"], file(params.fasta_mref)]).collect()
+    ch_fai_mref = channel.of([ [id:"reference_fasta_fai_mouse"], file(params.fasta_mref + ".fai")]).collect()
+
+    RESOLVE_PDX (
+        ch_fastqs_split.ch_fastqs_for_disambiguate, 
+        ch_fasta_href,
+        ch_fai_href,
+        ch_bwa_index_href,
+        ch_fasta_mref,      // Mouse FASTA reference
+        ch_fai_mref,        // Mouse FASTA FAI reference
+        ch_bwa_index_mref   // Mouse BWA Index
+    )
+    ch_versions = ch_versions.mix(RESOLVE_PDX.out.versions)
+
+    
 
     ALIGNMENT (
-        ch_fastq_input,
+        ch_fastqs_split.ch_fastq_input, 
         ch_fasta_href,
         ch_fai_href,
         ch_bwa_index_href
     )
+    ch_versions = ch_versions.mix(ALIGNMENT.out.versions)
 
     //
     // MODULE: Run FastQC
