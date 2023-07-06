@@ -61,7 +61,7 @@ workflow ALIGNMENT {
         ch_fai
     )
     ch_versions = ch_versions.mix(BAM_MARKDUPLICATES_PICARD.out.versions.first())
-
+ 
     emit:
     bam = BAM_MARKDUPLICATES_PICARD.out.bam
     bai = BAM_MARKDUPLICATES_PICARD.out.bai
