@@ -12,9 +12,9 @@ process NGS_DISAMBIGUATE {
     tuple val(meta), path(bam_b) // mouse
 
     output:
-    tuple val(meta), path("$outputdir/*.disambiguatedSpeciesA.bam")  , emit: bam_disambiguated_a
-    tuple val(meta), path("$outputdir/*.disambiguatedSpeciesA.bam")  , emit: bam_disambiguated_b
-    tuple val(meta), path("$outputdir/*_summary.txt")                , emit: summary
+    tuple val(meta), path("${meta.id}/*.disambiguatedSpeciesA.bam")  , emit: bam_disambiguated_a
+    tuple val(meta), path("${meta.id}/*.disambiguatedSpeciesA.bam")  , emit: bam_disambiguated_b
+    tuple val(meta), path("${meta.id}/*_summary.txt")                , emit: summary
     path "versions.yml"                                              , emit: versions
 
     when:
@@ -23,10 +23,10 @@ process NGS_DISAMBIGUATE {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    outputdir = ${prefix}_disambiguated
+    def outputdir = "${prefix}"
     """
     ngs_disambiguate --prefix ${prefix} \\
-        ${args} \\
+        $args \\
         --output-dir $outputdir \\
         --aligner bwa \\
         $bam_a \\
@@ -34,8 +34,7 @@ process NGS_DISAMBIGUATE {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        ngs_disambiguate: \$(echo \$(ngs_disambiguate --version)
-        bwa: \$(bwa --version)
+        ngs_disambiguate: \$(echo \$(ngs_disambiguate --version) | sed 's/^.*version: //')
     END_VERSIONS
     """
 }
