@@ -93,7 +93,7 @@ workflow PHOENIX {
             INPUT_CHECK_BAM.out.bams
         )
         ch_versions = ch_versions.mix(UNPACK_BAM.out.versions)
-        ch_fastqs_start = ch_fastqs_start.mix(UNPACK_BAM.out.fastqs)
+        ch_fastqs_start = ch_fastqs_start.mix(UNPACK_BAM.out.reads)
     }
 
     //
