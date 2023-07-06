@@ -24,9 +24,7 @@ class RowChecker:
 
     """
 
-    VALID_FORMATS = (
-        ".bam",
-    )
+    VALID_FORMATS = (".bam",)
 
     def __init__(
         self,
@@ -44,7 +42,7 @@ class RowChecker:
             bam_col (str): The name of the column that contains the first (or only)
                 BAM file path.
             pdx_col (str): The name of the new column that is true if sample is PDX,
-                inserted if empty 
+                inserted if empty
 
 
         """
@@ -91,7 +89,7 @@ class RowChecker:
                 f"It should be one of: {', '.join(self.VALID_FORMATS)}"
             )
 
-    def _validate_pdx_val(self, row): 
+    def _validate_pdx_val(self, row):
         if row[self._pdx_col].lower() == "true":
             row[self._pdx_col] = True
         else:

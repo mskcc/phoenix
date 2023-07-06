@@ -52,7 +52,7 @@ class RowChecker:
                 records whether the sample contains single- or paired-end sequencing
                 reads (default "single_end").
             pdx_col (str): The name of the new column that is true if sample is PDX,
-                inserted if empty 
+                inserted if empty
 
 
         """
@@ -119,7 +119,7 @@ class RowChecker:
                 f"It should be one of: {', '.join(self.VALID_FORMATS)}"
             )
 
-    def _validate_pdx_val(self, row): 
+    def _validate_pdx_val(self, row):
         if row[self._pdx_col].lower() == "true":
             row[self._pdx_col] = True
         else:
