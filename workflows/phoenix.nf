@@ -35,6 +35,8 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
+include { INPUT_CHECK_BAM } from '../subworkflows/local/input_check_bam'
+include { UNPACK_BAM } from '../modules/local/unpack_bam'
 include { ALIGNMENT } from '../subworkflows/local/alignment/main'
 include { RESOLVE_PDX } from '../subworkflows/local/resolve_pdx/main'
 
@@ -64,33 +66,52 @@ def multiqc_report = []
 workflow PHOENIX {
 
     ch_versions = Channel.empty()
+    ch_fastqs_start = Channel.empty()
 
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
+    // TODO: Add INPUT_CHECK for ch_input_bam
+    if (params.input) {
+        ch_input = file(params.input)
+        INPUT_CHECK (
+            ch_input
+        )
+        ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
+        ch_fastqs_start = INPUT_CHECK.out.reads
+    }
+    
     //
-    INPUT_CHECK (
-        ch_input
-    )
-    ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
+    // SUBWORKFLOW: If there are any input_bam files, unpack them first
+    //
+    if (params.input_bam) {
+        ch_input_bam = file(params.input_bam)
+        INPUT_CHECK_BAM (
+            ch_input_bam
+        )
+        ch_versions = ch_versions.mix(INPUT_CHECK_BAM.out.versions)
+        UNPACK_BAM (
+            INPUT_CHECK_BAM.out.bams
+        )
+        ch_versions = ch_versions.mix(UNPACK_BAM.out.versions)
+        ch_fastqs_start = ch_fastqs_start.mix(UNPACK_BAM.out.fastqs)
+    }
 
     //
     // SUBWORKFLOW: TrimGalore if skip_trimming is false;
     //      skip_trimming is by default false, switched to true
     //      with command line argument --skip_trimming
     //
-
     ch_fastq_input = Channel.empty()    
     if (!params.skip_trimming) {
         TRIMGALORE(
-            INPUT_CHECK.out.reads
+            ch_fastqs_start
         )
         ch_fastq_input = TRIMGALORE.out.reads
         ch_versions = ch_versions.mix(TRIMGALORE.out.versions.first())
     }
     else {
-        ch_fastq_input = INPUT_CHECK.out.reads
+        ch_fastq_input = ch_fastqs_start
     }
-
 
     ch_fastq_input
         .branch {
@@ -138,7 +159,7 @@ workflow PHOENIX {
     // MODULE: Run FastQC
     //
     FASTQC (
-        INPUT_CHECK.out.reads
+        ch_fastqs_start
     )
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
