@@ -21,7 +21,7 @@ process SAMPLESHEET_CHECK_BAM {
     """
     check_samplesheet_bam.py \\
         $samplesheet \\
-        samplesheet.valid.csv
+        samplesheet_bam.valid.csv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

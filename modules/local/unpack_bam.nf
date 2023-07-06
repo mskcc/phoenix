@@ -1,8 +1,7 @@
 process UNPACK_BAM {
     tag "$input_bam"
-    label 'process_single'
+    label 'process_high'
 
-    conda "bioconda::picard=3.0.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'docker://mskcc/unpack_bam:0.1.0' :
         'docker.io/mskcc/unpack_bam:0.1.0' }"
@@ -20,7 +19,7 @@ process UNPACK_BAM {
     script: // This script is bundled with the pipeline, in nf-core/phoenix/bin/
             // TODO: Move picard jar out or create a container with this tool's reqs
     """
-    unpack_bam.pl \\
+    perl unpack_bam.pl \\
         --input-bam $input_bam \\
         --sample-id ${meta.id} \\
         --picard-jar /opt/common/CentOS_6-dev/picard/v2.13/picard.jar \\
