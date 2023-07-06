@@ -12,6 +12,10 @@
                 "pattern": "^\\S+$",
                 "errorMessage": "Sample name must be provided and cannot contain spaces"
             },
+            "is_pdx": {
+                "type": "boolean",
+                "errorMessage": "Sample must be labeled as pdx, true or false"
+            },
             "fastq_1": {
                 "type": "string",
                 "pattern": "^\\S+\\.f(ast)?q\\.gz$",
