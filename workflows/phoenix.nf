@@ -159,7 +159,7 @@ workflow PHOENIX {
     // MODULE: Run FastQC
     //
     FASTQC (
-        ch_fastqs_start
+        ch_fastq_input
     )
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
