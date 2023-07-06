@@ -33,11 +33,12 @@ unless( @ARGV and $ARGV[0]=~m/^-/ ) {
 
 # Parse options and print usage syntax on a syntax error, or if help was explicitly requested
 my ( $man, $help ) = ( 0, 0 );
-my ( $bam_file, $output_dir, $sample_id );
+my ( $bam_file, $output_dir, $sample_id, $tmp_dir );
 GetOptions(
     'help!' => \$help,
     'man!' => \$man,
     'input-bam=s' => \$bam_file,
+    'tmp-dir=s' => \$tmp_dir,
     'output-dir=s' => \$output_dir,
     'sample-id=s' => \$sample_id,
     'picard-jar=s' => \$picard_jar
@@ -130,7 +131,7 @@ warn "STATUS: Parsed " . scalar( @rg_lines ) . " \@RG lines from BAM and wrote t
 
 # Unless FASTQs already exist, use Picard to revert BQ scores, and create FASTQs; then zip em up
 unless( $skip_picard ) {
-    my $cmd = "$java_bin -Xmx6g -jar $picard_jar RevertSam TMP_DIR=/scratch INPUT=$bam_file OUTPUT=/dev/stdout SANITIZE=true COMPRESSION_LEVEL=0 VALIDATION_STRINGENCY=SILENT | java -Xmx6g -jar $picard_jar SamToFastq TMP_DIR=/scratch INPUT=/dev/stdin OUTPUT_PER_RG=true RG_TAG=$rg_tag OUTPUT_DIR=$output_dir VALIDATION_STRINGENCY=SILENT";
+    my $cmd = "$java_bin -Xmx6g -jar $picard_jar RevertSam TMP_DIR=$tmp_dir INPUT=$bam_file OUTPUT=/dev/stdout SANITIZE=true COMPRESSION_LEVEL=0 VALIDATION_STRINGENCY=SILENT | java -Xmx6g -jar $picard_jar SamToFastq TMP_DIR=$tmp_dir INPUT=/dev/stdin OUTPUT_PER_RG=true RG_TAG=$rg_tag OUTPUT_DIR=$output_dir VALIDATION_STRINGENCY=SILENT";
     print "RUNNING: $cmd\n";
     print `$cmd`;
     print "RUNNING: gzip $output_dir/*.fastq\n";
