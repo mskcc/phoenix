@@ -22,7 +22,7 @@
 <!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->
 
 1. Given a bam, unpacks the bam into fastqs
-2. Given xengografts, disambiguates between mouse and human reads
+2. Given xenografts, disambiguates between mouse and human reads
 3. If `skip_trimming` is `false` (default), trims fastq reads through `trimgalore` 
 4. Uses the typical alignment pipeline provided by `nf-core/subworkflows/fastq_align_bwa`, then `MarkDuplicates`
 5. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
@@ -33,7 +33,6 @@
 > **Note**
 > If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how
 > to set-up Nextflow.
-
 
 First, prepare a samplesheet with your input data that looks as follows:
 
@@ -54,6 +53,28 @@ Similarly, a samplesheet containing bam input data is accepted. It should look a
 sample,is_pdx,bam
 CONTROL_REP1,true,my_data.bam
 ```
+
+### JUNO Config
+
+For use with MSKCC's JUNO cluster, set these environment variables:
+```
+export NXF_SINGULARITY_CACHEDIR=/juno/work/ci/singularity_cachedir_nxf
+
+module load java/jdk-11.0.11
+module load singularity/3.7.1
+```
+
+Now, you can run the pipeline using:
+
+```bash
+nextflow run main.nf \
+   -profile juno,singularity \
+   <--input samplesheet.csv AND/OR --input_bam samplesheet_bam.csv> \
+   --outdir <OUTDIR>
+```
+
+### General Use
+
 Finally, edit `conf/resources.config` to include the required reference genome and the directory of the corresponding `bwa` index.
 
 ```java 
@@ -68,8 +89,6 @@ params {
 ```
 
 Now, you can run the pipeline using:
-
-<!-- TODO nf-core: update the following command to include all required parameters for a minimal example -->
 
 ```bash
 nextflow run main.nf \
