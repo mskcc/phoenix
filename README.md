@@ -32,8 +32,7 @@
 
 > **Note**
 > If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how
-> to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline)
-> with `-profile test` before running the workflow on actual data.
+> to set-up Nextflow.
 
 
 First, prepare a samplesheet with your input data that looks as follows:
@@ -91,9 +90,7 @@ For more details, please refer to the [usage documentation](https://nf-co.re/pho
 
 ## Pipeline output
 
-To see the the results of a test run with a full size dataset refer to the [results](https://nf-co.re/phoenix/results) tab on the nf-core website pipeline page.
-For more details about the output files and reports, please refer to the
-[output documentation](https://nf-co.re/phoenix/output).
+Currently, all output is placed into the directory defined by `--outdir`.
 
 ## Credits
 
