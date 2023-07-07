@@ -110,5 +110,12 @@ NOTE: You can use the input arguments `--input` and `--input_bam` individually o
 For more details, please refer to the [usage documentation](https://nf-co.re/phoenix/usage) and the [parameter documentation](https://nf-co.re/phoenix/parameters).
 
 ## Pipeline output
+All output paths relative to the OUTDIR directory defined by input parameter `--outdir`.
 
-Currently, all output is placed into the directory defined by `--outdir`.
+Final bam outputs are placed in the subdirectory `bam/`. 
+
+FASTQC and MULTIQC outputs are located in the `fastqc` and `multiqc` directories, respectively.
+
+Intermediate outputs are placed in the subdirectory `intermediate/`. These files should be safe to delete if `-resume` is no longer needed.
+
+Pipeline run information, such as the software versions used in the pipeline, can be found in `pipeline_info/`.
