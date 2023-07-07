@@ -69,6 +69,7 @@ Now, you can run the pipeline using:
 ```bash
 nextflow run main.nf \
    -profile juno,singularity \
+   <--skip_trimming> \  # Omit if you want TrimGalore to run
    <--input samplesheet.csv AND/OR --input_bam samplesheet_bam.csv> \
    --outdir <OUTDIR>
 ```
@@ -93,6 +94,7 @@ Now, you can run the pipeline using:
 ```bash
 nextflow run main.nf \
    -profile resources,<docker/singularity/.../institute> \
+   <--skip_trimming> \  # Omit if you want TrimGalore to run
    <--input samplesheet.csv AND/OR --input_bam samplesheet_bam.csv> \
    --outdir <OUTDIR>
 ```
