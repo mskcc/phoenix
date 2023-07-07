@@ -55,6 +55,18 @@ Similarly, a samplesheet containing bam input data is accepted. It should look a
 sample,is_pdx,bam
 CONTROL_REP1,true,my_data.bam
 ```
+Finally, edit `conf/resources.config` to include the required reference genome and the directory of the corresponding `bwa` index.
+
+```java 
+// conf/resources.config
+params {
+    fasta_href = "/path/to/human/genome/genome.fa"
+    bwa_index_href = "/path/to/human/genome"   // bwa index usually same location as genome.fa
+
+    fasta_mref = "/path/to/mouse/genome/genome.fa"
+    bwa_index_mref = "/path/to/mouse/genome"   // bwa index usually same location as genome.fa
+}
+```
 
 Now, you can run the pipeline using:
 
@@ -62,10 +74,13 @@ Now, you can run the pipeline using:
 
 ```bash
 nextflow run main.nf \
-   -profile <docker/singularity/.../institute> \
-   [--input samplesheet.csv | --input_bam samplesheet_bam.csv ]\
+   -profile resources,<docker/singularity/.../institute> \
+   <--input samplesheet.csv AND/OR --input_bam samplesheet_bam.csv> \
    --outdir <OUTDIR>
 ```
+
+NOTE: `samplesheet.csv` can contain both pdx and non-pdx samples.
+NOTE: You can use the input arguments `--input` and `--input_bam` individually or at the same time when running `phoenix`.
 
 > **Warning:**
 > Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those
