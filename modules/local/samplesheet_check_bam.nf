@@ -4,8 +4,8 @@ process SAMPLESHEET_CHECK_BAM {
 
     conda "conda-forge::python=3.8.3"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/python:3.8.3' :
-        'public.ecr.aws/docker/library/python:3.12.0-bookworm' }"
+        'public.ecr.aws/docker/library/python:3.12-bookworm' :
+        'public.ecr.aws/docker/library/python:3.12-bookworm' }"
 
     input:
     path samplesheet
