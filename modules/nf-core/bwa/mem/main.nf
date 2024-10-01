@@ -4,8 +4,8 @@ process BWA_MEM {
 
     conda "bioconda::bwa=0.7.17 bioconda::samtools=1.16.1"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/mulled-v2-fe8faa35dbf6dc65a0f7f5d4ea12e31a79f73e40:219b6c272b25e7e642ae3ff0bf0c5c81a5135ab4-0' :
-        'biocontainers/mulled-v2-fe8faa35dbf6dc65a0f7f5d4ea12e31a79f73e40:219b6c272b25e7e642ae3ff0bf0c5c81a5135ab4-0' }"
+        '058264265624.dkr.ecr.us-east-1.amazonaws.com/bwa_mem' :
+        '058264265624.dkr.ecr.us-east-1.amazonaws.com/bwa_mem' }"
 
     input:
     tuple val(meta), path(reads)
