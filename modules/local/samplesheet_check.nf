@@ -4,7 +4,7 @@ process SAMPLESHEET_CHECK {
 
     conda "conda-forge::python=3.8.3"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'public.ecr.aws/docker/library/python:3.12-bookworm'' :
+        'public.ecr.aws/docker/library/python:3.12-bookworm' :
         'public.ecr.aws/docker/library/python:3.12-bookworm' }"
 
     input:
