@@ -3,8 +3,8 @@ process UNPACK_BAM {
     label 'process_high'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'docker://mskcc/unpack_bam:0.1.0' :
-        'docker.io/mskcc/unpack_bam:0.1.0' }"
+        '058264265624.dkr.ecr.us-east-1.amazonaws.com/unpack_bam:0.1.0' :
+        '058264265624.dkr.ecr.us-east-1.amazonaws.com/unpack_bam:0.1.0' }"
 
     input:
     tuple val(meta), path(input_bam)

@@ -4,8 +4,8 @@ process BWA_MEM {
 
     conda "bioconda::bwa=0.7.17 bioconda::samtools=1.16.1"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        '058264265624.dkr.ecr.us-east-1.amazonaws.com/bwa_mem' :
-        '058264265624.dkr.ecr.us-east-1.amazonaws.com/bwa_mem' }"
+        '058264265624.dkr.ecr.us-east-1.amazonaws.com/bwa_mem:0.7.12' :
+        '058264265624.dkr.ecr.us-east-1.amazonaws.com/bwa_mem:0.7.12' }"
 
     input:
     tuple val(meta), path(reads)
