@@ -4,8 +4,8 @@ process NGS_DISAMBIGUATE {
 
     conda "bioconda::ngs-disambiguate=2016.11.10-0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'mskcc/disambiguate:1.0.0' :
-        'public.ecr.aws/biocontainers/ngs-disambiguate:2016.11.10--0' }"
+        '058264265624.dkr.ecr.us-east-1.amazonaws.com/disambiguate:1.0.0' :
+        '058264265624.dkr.ecr.us-east-1.amazonaws.com/disambiguate:1.0.0' }"
 
     input:
     tuple val(meta), path(bam_a) // human

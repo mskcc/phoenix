@@ -4,8 +4,8 @@ process PICARD_MERGESAMFILES {
 
     conda "bioconda::picard=3.0.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/picard:3.0.0--hdfd78af_1' :
-        'public.ecr.aws/biocontainers/picard:3.0.0--hdfd78af_1' }"
+        '058264265624.dkr.ecr.us-east-1.amazonaws.com/roslin-variant-picard:2.9.bash' :
+        '058264265624.dkr.ecr.us-east-1.amazonaws.com/roslin-variant-picard:2.9.bash' }"
 
     input:
     tuple val(meta), path(bams)

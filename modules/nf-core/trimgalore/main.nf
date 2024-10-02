@@ -4,8 +4,8 @@ process TRIMGALORE {
 
     conda "bioconda::trim-galore=0.6.7"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/trim-galore:0.6.7--hdfd78af_0' :
-        'public.ecr.aws/biocontainers/trim-galore:0.6.7--hdfd78af_0' }"
+        '058264265624.dkr.ecr.us-east-1.amazonaws.com/roslin-variant-trimgalore:0.2.5.mod.bash' :
+        '058264265624.dkr.ecr.us-east-1.amazonaws.com/roslin-variant-trimgalore:0.2.5.mod.bash' }"
 
     input:
     tuple val(meta), path(reads)
